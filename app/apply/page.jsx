@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { checkPhoneExists, sendOtp, verifyOtp, submitLead, makeBypassToken } from '@/lib/admissionApi';
+import { checkPhoneExists, sendAskEvaOtp, submitLead, makeBypassToken } from '@/lib/admissionApi';
+import { openRazorpayPaymentButton } from '@/lib/razorpay';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -179,6 +180,7 @@ export default function ApplyPage() {
   const [otpError, setOtpError] = useState('');
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [otpSentPhone, setOtpSentPhone] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState('');
   const otpRefs = useRef([]);
 
   // Step 4: Full lead form
@@ -202,6 +204,8 @@ export default function ApplyPage() {
 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
 
   // ─── OTP countdown ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -297,7 +301,8 @@ export default function ApplyPage() {
       } else {
         setIsExistingUser(false);
         setExistingLead(null);
-        const otpRes = await sendOtp(primaryContact.phone);
+        const otpRes = await sendAskEvaOtp(primaryContact.phone);
+        setGeneratedOtp(otpRes.otp);
         setOtpSentPhone(primaryContact.phone);
         setOtpCountdown(OTP_RESEND_SECONDS);
         setOtpDigits(Array(OTP_LENGTH).fill(''));
@@ -336,7 +341,8 @@ export default function ApplyPage() {
       } else {
         setIsExistingUser(false);
         setExistingLead(null);
-        const otpRes = await sendOtp(primaryContact.phone);
+        const otpRes = await sendAskEvaOtp(primaryContact.phone);
+        setGeneratedOtp(otpRes.otp);
         setOtpSentPhone(primaryContact.phone);
         setOtpCountdown(OTP_RESEND_SECONDS);
         setOtpDigits(Array(OTP_LENGTH).fill(''));
@@ -382,8 +388,10 @@ export default function ApplyPage() {
     setApiError('');
     setLoading(true);
     try {
-      const res = await verifyOtp(otpSentPhone, otp);
-      setVerificationToken(res.token);
+      if (otp !== generatedOtp) {
+        throw new Error('Invalid OTP. Please try again.');
+      }
+      setVerificationToken(makeBypassToken(otpSentPhone));
       setCurrentStep('lead_form');
     } catch (err) {
       setOtpError(err.message || 'Invalid OTP. Please try again.');
@@ -397,7 +405,8 @@ export default function ApplyPage() {
     setApiError('');
     setLoading(true);
     try {
-      const res = await sendOtp(otpSentPhone);
+      const otpRes = await sendAskEvaOtp(otpSentPhone);
+      setGeneratedOtp(otpRes.otp);
       setOtpCountdown(OTP_RESEND_SECONDS);
       setOtpDigits(Array(OTP_LENGTH).fill(''));
       setOtpError('');
@@ -405,6 +414,19 @@ export default function ApplyPage() {
       setApiError(err.message || 'Failed to resend OTP.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePaymentClick = async () => {
+    if (paymentLoading) return;
+    setPaymentError('');
+    setPaymentLoading(true);
+    try {
+      await openRazorpayPaymentButton();
+    } catch (err) {
+      setPaymentError(err.message || 'Payment could not be started. Please try again.');
+    } finally {
+      setPaymentLoading(false);
     }
   };
 
@@ -1159,9 +1181,17 @@ export default function ApplyPage() {
             </p>
           </div>
 
-          <button className="w-full max-w-lg bg-[#CC0000] hover:bg-[#990000] text-white font-bold py-3.5 rounded-md transition-colors tracking-widest text-sm uppercase">
-            APPLY NOW
+          <button
+            type="button"
+            onClick={handlePaymentClick}
+            disabled={paymentLoading}
+            className="w-full max-w-lg bg-[#CC0000] hover:bg-[#990000] text-white font-bold py-3.5 rounded-md transition-colors tracking-widest text-sm uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {paymentLoading ? 'Opening payment...' : 'APPLY NOW'}
           </button>
+          {paymentError && (
+            <p role="alert" className="text-red-200 text-sm mt-3">{paymentError}</p>
+          )}
 
         </div>
       </div>
