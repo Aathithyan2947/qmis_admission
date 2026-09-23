@@ -1,5 +1,5 @@
 import AdmissionsLandingPage from '@/components/admissions/AdmissionsLandingPage';
 
-export default function HomePage() {
+export default function AdmissionsPage() {
   return <AdmissionsLandingPage />;
 }
