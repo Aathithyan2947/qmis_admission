@@ -69,11 +69,6 @@ function FormShell({ title, children }) {
           {children}
         </div>
 
-        {/* Language toggle */}
-        <p className="text-center text-sm text-gray-500 mt-4">
-          English |{' '}
-          <span className="cursor-pointer hover:underline">தமிழ்</span>
-        </p>
       </div>
     </div>
   );
@@ -561,10 +556,6 @@ export default function ApplyPage() {
             </form>
           </div>
 
-          <p className="text-center text-sm text-gray-500 mt-4">
-            English |{' '}
-            <span className="cursor-pointer hover:underline">தமிழ்</span>
-          </p>
         </div>
       </div>
     );
@@ -1063,9 +1054,6 @@ export default function ApplyPage() {
           Next
         </button>
 
-        <p className="text-xs text-gray-400 mt-4">
-          English | <span className="cursor-pointer hover:underline">தமிழ்</span>
-        </p>
       </div>
     );
   }
@@ -1116,9 +1104,6 @@ export default function ApplyPage() {
           Next
         </button>
 
-        <p className="text-xs text-gray-400 mt-4">
-          English | <span className="cursor-pointer hover:underline">தமிழ்</span>
-        </p>
       </div>
     );
   }
@@ -1183,9 +1168,6 @@ export default function ApplyPage() {
             APPLY NOW
           </button>
 
-          <p className="text-xs text-white/40 mt-4">
-            English | <span className="cursor-pointer hover:underline">தமிழ்</span>
-          </p>
         </div>
       </div>
     );
