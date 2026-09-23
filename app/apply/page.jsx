@@ -303,7 +303,6 @@ export default function ApplyPage() {
         setOtpDigits(Array(OTP_LENGTH).fill(''));
         setOtpError('');
         prefillFormFromContact(rel, primaryContact, null);
-        if (otpRes.demoOtp) setApiError(`Demo OTP: ${otpRes.demoOtp}`);
         setCurrentStep('otp');
       }
     } catch (err) {
@@ -343,9 +342,6 @@ export default function ApplyPage() {
         setOtpDigits(Array(OTP_LENGTH).fill(''));
         setOtpError('');
         prefillFormFromContact(relationship, primaryContact, null);
-        if (otpRes.demoOtp) {
-          setApiError(`Demo OTP: ${otpRes.demoOtp}`);
-        }
         setCurrentStep('otp');
       }
     } catch (err) {
@@ -405,7 +401,6 @@ export default function ApplyPage() {
       setOtpCountdown(OTP_RESEND_SECONDS);
       setOtpDigits(Array(OTP_LENGTH).fill(''));
       setOtpError('');
-      if (res.demoOtp) setApiError(`Demo OTP: ${res.demoOtp}`);
     } catch (err) {
       setApiError(err.message || 'Failed to resend OTP.');
     } finally {
