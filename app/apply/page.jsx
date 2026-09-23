@@ -526,16 +526,7 @@ export default function ApplyPage() {
   if (currentStep === 'signin') {
     return (
       <div className="min-h-screen bg-[#f0f0f0]">
-        <div className="w-full bg-white">
-          <Image
-            src="/step_8.png"
-            alt="Sign In"
-            width={1200}
-            height={400}
-            className="w-full h-auto object-cover"
-            priority
-          />
-        </div>
+        <Banner />
 
         <div className="py-6 px-4">
           <div className="flex justify-center mb-5">
